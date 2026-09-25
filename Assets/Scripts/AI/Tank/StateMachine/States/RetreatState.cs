@@ -29,7 +29,7 @@ namespace CE6127.Tanks.AI
             base.Enter();
 
             m_TankSM.SetStopDistanceToZero();
-            m_FireCooldown = 0.35f;
+            m_FireCooldown = 0.5f;
             m_NextPathUpdate = 0f;
             m_SideSign = Random.value > 0.5f ? 1f : -1f;
 
@@ -102,7 +102,7 @@ namespace CE6127.Tanks.AI
                 else
                 {
                     m_TankSM.LaunchProjectile(launchSpeed);
-                    m_FireCooldown = Random.Range(0.35f, 0.5f);
+                    m_FireCooldown = 0.5f;
                 }
             }
         }

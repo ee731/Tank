@@ -27,7 +27,7 @@ namespace CE6127.Tanks.AI
             // The destination is ahead of / beside the player, not the player itself, so drive all the way to it.
             m_TankSM.SetStopDistanceToZero();
             m_TankSM.NavMeshUpdateDeadline = 0f; // Plot the first intercept immediately.
-            m_FireCooldown = Mathf.Max(m_FireCooldown, 0.35f);
+            m_FireCooldown = Mathf.Max(m_FireCooldown, 0.5f);
             Debug.Log($"[ChasingState] Enter - intercept pursuit, flank side {m_TankSM.FlankSide()}");
         }
 
@@ -105,8 +105,8 @@ namespace CE6127.Tanks.AI
             if (m_TankSM.IsAimedAt(aimPoint) && m_TankSM.HasClearShot(launchSpeed))
             {
                 m_TankSM.LaunchProjectile(launchSpeed);
-                // Same human-achievable rate cap as AttackingState (TankShooting.CooldownTime = 0.35s).
-                m_FireCooldown = Random.Range(0.35f, 0.5f);
+                // Same 0.5s cooldown as AttackingState.
+                m_FireCooldown = 0.5f;
             }
             else
             {

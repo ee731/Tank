@@ -27,8 +27,8 @@ namespace CE6127.Tanks.AI
             // Don't stop completely — we strafe around the target.
             m_TankSM.SetStopDistanceToZero();
 
-            // Fire no faster than a human player can (TankShooting.CooldownTime = 0.35s).
-            m_FireCooldown = 0.35f;
+            // Wait one full cooldown (0.5s) before the first shot.
+            m_FireCooldown = 0.5f;
 
             // Initialize strafing: pick a starting angle based on current position.
             // Start the orbit on our own side of the target, not the far side.
@@ -113,7 +113,7 @@ namespace CE6127.Tanks.AI
             Vector3 aimPoint = m_TankSM.GetFiringSolution(out float launchSpeed);
             m_TankSM.FaceTowards(aimPoint);
 
-            // --- Rapid fire: almost no cooldown ---
+            // --- Fire every 0.5s when the shot is clear ---
             m_FireCooldown -= Time.deltaTime;
             if (m_FireCooldown <= 0f)
             {
@@ -130,9 +130,8 @@ namespace CE6127.Tanks.AI
                     // Launch speed solved from the ballistic arc so the shell lands on the aim point.
                     m_TankSM.LaunchProjectile(launchSpeed);
 
-                    // Cap at human-achievable rate: the player's minimum time between
-                    // shots is TankShooting.CooldownTime = 0.35s (~2.9 shots/sec).
-                    m_FireCooldown = Random.Range(0.35f, 0.5f);
+                    // Fixed 0.5s cooldown between shots (the player's minimum is 0.35s).
+                    m_FireCooldown = 0.5f;
                 }
             }
         }
