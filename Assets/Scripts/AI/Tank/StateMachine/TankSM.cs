@@ -307,12 +307,20 @@ namespace CE6127.Tanks.AI
         }
 
         /// <summary>
+        /// Method <c>FixedUpdate</c> is called every physics step. The target velocity is sampled here because the
+        /// player tank only moves in FixedUpdate: sampling per rendered frame gives 0 on most frames and a spike on
+        /// the rest, so the estimate would depend on the frame rate (and differ between the Editor and a build).
+        /// </summary>
+        private void FixedUpdate()
+        {
+            TrackTargetVelocity();
+        }
+
+        /// <summary>
         /// Method <c>Update</c> is called every frame, if the MonoBehaviour is enabled.
         /// </summary>
         private new void Update()
         {
-            TrackTargetVelocity();
-
             if (!m_Started && GameManager.IsRoundPlaying)
             {
                 m_Started = true;
@@ -332,12 +340,14 @@ namespace CE6127.Tanks.AI
         }
 
         /// <summary>
-        /// Method <c>TrackTargetVelocity</c> estimates the target's ground velocity from its frame-to-frame motion.
+        /// Method <c>TrackTargetVelocity</c> estimates the target's ground velocity from its step-to-step motion.
         /// The player tank moves with <c>Rigidbody.MovePosition</c>, so its rigidbody velocity can't be trusted.
+        /// Called from <c>FixedUpdate</c>, so it runs in lockstep with the player's movement at any frame rate.
         /// </summary>
         private void TrackTargetVelocity()
         {
-            if (Target == null || Time.deltaTime <= 0f)
+            float dt = Time.fixedDeltaTime;
+            if (Target == null || dt <= 0f)
             {
                 m_HasLastTargetPos = false;
                 return;
@@ -346,12 +356,12 @@ namespace CE6127.Tanks.AI
             Vector3 pos = Target.position;
             if (m_HasLastTargetPos)
             {
-                Vector3 v = (pos - m_LastTargetPos) / Time.deltaTime;
+                Vector3 v = (pos - m_LastTargetPos) / dt;
                 v.y = 0f;
                 // A jump bigger than any tank can drive (respawn/teleport) resets the estimate.
                 if (v.sqrMagnitude > 50f * 50f)
                     v = Vector3.zero;
-                m_TargetVelocity = Vector3.Lerp(m_TargetVelocity, v, 1f - Mathf.Exp(-10f * Time.deltaTime));
+                m_TargetVelocity = Vector3.Lerp(m_TargetVelocity, v, 1f - Mathf.Exp(-10f * dt));
             }
             m_LastTargetPos = pos;
             m_HasLastTargetPos = true;
